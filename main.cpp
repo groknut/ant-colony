@@ -15,7 +15,10 @@ int main(int argc, char** argv)
 {
 
 	if (argc != 2)
+	{
 		helper(argv[0]);
+		return 0;
+	}
 		
 	Ic ic(argv[1]);
 	Graph graph(ic);
