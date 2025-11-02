@@ -1,0 +1,202 @@
+
+#include "../head/ant.h"
+
+Ant::Ant(double a, double b, double r) : alpha(a), beta(b), rho(r) {}
+
+AntColony::AntColony(const Ic& aic, Graph& g) : ic(aic), graph(g), rng(random_device{}())
+{
+	initPher();
+}
+
+void AntColony::initPher()
+{
+	for (auto& node : graph.get_nodes())
+		for (auto& other : graph.get_nodes())
+			if (node != other && node->isNeigh(other))
+				pher[make_pair(node, other)] = ic.as_int("colony", "init");	
+}
+
+double AntColony::getPher(Node* a, Node* b) const
+{
+	auto it = pher.find(make_pair(a, b));
+	if (it != pher.end())
+		return it->second;
+	return ic.as_double("colony", "init");
+}
+
+void AntColony::updatePher(Node* a, Node* b, double val)
+{
+	pher[make_pair(a, b)] = val;
+}
+
+int AntColony::computePathLength(const vector<Node*>& path) const {
+   	int length = 0;
+   	for (size_t i = 0; i + 1 < path.size(); i++) {
+       	Node* a = path[i];
+       	Node* b = path[i + 1];
+       	length += a->getWeight(b);
+   	}
+   	return length;
+}
+
+void AntColony::initAnts(std::vector<Ant>& ants)
+{
+	for (size_t i = 0; i < (size_t)ic.as_int("colony", "nants"); i++)
+		ants.emplace_back(
+			ic.as_double("ant", "alpha"),
+			ic.as_double("ant", "beta"),
+			ic.as_double("ant", "rho")
+		);
+}
+
+void AntColony::run() 
+{
+	set<Node*> nodeSet = graph.get_nodes();
+	vector<Node*> nodes(nodeSet.begin(), nodeSet.end());
+	int paraml = 1e6;
+	int bestLen = paraml;
+	vector<Node*> bestPath;
+
+	std::ofstream output_file(ic.getVal("output", "output_file"));
+
+	output_file << "Iteration,CurrentBestLength,AntId,AntPathLength,AntPath,PathType" << std::endl;
+
+	int antId = 1;
+
+	for (size_t i = 0; i < (size_t)ic.as_int("colony", "iters"); i++)
+	{
+        size_t p = ic.has("colony", "packs") ? (size_t)ic.as_int("colony", "packs") : 1;
+		for (size_t j = 0; j < p; j++)
+		{
+			std::vector<Ant> ants;
+			initAnts(ants);
+			for (Ant& ant : ants)
+				runAnt(ant, nodes, bestLen, bestPath, i, antId++, output_file);
+		}
+	}
+
+	output_file.close();
+
+	if (bestLen == paraml)
+	{
+		cout << "inf" << std::endl;
+		return;
+	}
+
+	cout << "Best path length: " << bestLen << std::endl << "Path: ";
+	
+	for (auto n : bestPath)
+		cout << n->getName() << " ";
+		
+	std::cout << std::endl;
+}
+
+void AntColony::runAnt(Ant& ant, vector<Node*>& nodes, int& bestLen, vector<Node*>& bestPath, size_t& iter, const int& antId, std::ofstream& outfile)
+{
+
+	std::vector<Node*> path = buildAntPath(nodes, ant);
+
+	double len = computePathLength(path);
+	double currBestLen = bestLen;
+	bool pathType = false;
+
+	if (len < bestLen && path.size() == nodes.size() + 1)
+	{
+		bestLen = len;
+		bestPath = path;
+		pathType = true;
+	}
+	outfile << iter << "," << currBestLen << "," << antId << "," << len << ",";
+
+	for (size_t i = 0; i < path.size(); i++)
+	{
+		outfile << path[i]->getName();
+		if (i + 1 < path.size())
+			outfile << "-";
+	}
+	
+	outfile << "," << pathType;
+	
+	outfile << std::endl;
+
+	updatePhers(path, len, ant);
+
+}
+
+void AntColony::updatePhers(vector<Node*>& path, const double& len, Ant& ant)
+{
+	for (size_t i = 0; i + 1 < path.size(); i++)
+	{
+		Node* a = path[i];
+		Node* b = path[i + 1];
+		updatePher(a, b, getPher(a, b) * (1 - ant.rho) + (ic.as_double("colony", "Q") / len));
+	}
+}
+
+
+vector<Node*> AntColony::buildAntPath(vector<Node*>& nodes, Ant& ant)
+{
+	unordered_map<Node*, bool> visited;
+	std::vector<Node*> path;
+	
+	for (auto n : nodes)
+		visited[n] = false;
+
+	Node* start = nodes[rng() % nodes.size()];
+	path.push_back(start);
+	visited[start] = true;
+
+	while (path.size() < nodes.size()) 
+	{
+		Node* next = chooseNextNode(path.back(), visited, ant);
+		if (!next)
+			break;
+		path.push_back(next);
+		visited[next] = true;
+	}
+
+	if (path.back()->isNeigh(start))                      
+		path.push_back(start);
+
+	return path;
+		
+}
+
+double AntColony::calcProb(Node* curr, Node* neigh, const Ant& ant)
+{
+	return pow(
+		getPher(curr, neigh), ant.alpha
+	) * pow(
+		1.0 / curr->getWeight(neigh), ant.beta
+	);
+}
+
+
+Node* AntColony::chooseNextNode(Node* current, const unordered_map<Node*, bool>& visited, const Ant& ant)
+{
+
+	double total = 0.0;
+	Node* select = nullptr;
+
+	for (auto it = current->nb_begin(); it != current->nb_end(); it++)
+		if (!visited.at(it->first))
+		{
+			total += calcProb(current, it->first, ant);
+			select = it->first;
+		}
+
+	double pick = uniform_real_distribution<double>(0.0, total)(rng);
+
+	double cum = 0.0;
+
+	for (auto it = current->nb_begin(); it != current->nb_end(); it++)
+	{
+		if (visited.at(it->first))
+			continue;
+		cum += calcProb(current, it->first, ant);
+		if (cum >= pick)
+			return it->first;
+	}
+
+	return select;	
+}
