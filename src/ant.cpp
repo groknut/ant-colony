@@ -59,6 +59,12 @@ void AntColony::run()
 
 	std::ofstream output_file(ic.getVal("output", "output_file"));
 
+	if (!output_file.is_open())
+	{
+		throw FileReadError();
+		return;
+	}
+
 	output_file << "Iteration,CurrentBestLength,AntId,AntPathLength,AntPath,PathType" << std::endl;
 
 	int antId = 1;

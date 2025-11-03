@@ -71,4 +71,6 @@ public:
    	void run(); // запуск алгоритма
 };
 
+class FileReadError {};
+
 #endif
