@@ -49,6 +49,18 @@ void AntColony::updatePhers(vector<Node*>& path, const double& len, Ant& ant)
 	}
 }
 
+double AntColony::getPhers(const vector<Node*>& path)
+{
+	double res = 0;
+	for (size_t i = 0; i + 1 < path.size(); i++)
+	{
+		Node* a = path[i];
+		Node* b = path[i + 1];
+		res += getPher(a, b);
+	}
+	return res;
+}
+
 int AntColony::computePathLength(const vector<Node*>& path) const {
    	int length = 0;
    	for (size_t i = 0; i + 1 < path.size(); i++) {
@@ -67,7 +79,6 @@ double AntColony::calcProb(Node* curr, Node* neigh, const Ant& ant)
 		1.0 / curr->getWeight(neigh), ant.beta
 	);
 }
-
 
 Node* AntColony::chooseNextNode(Node* current, const unordered_map<Node*, bool>& visited, const Ant& ant)
 {
@@ -140,6 +151,7 @@ void AntColony::runAnt(Ant& ant, vector<Node*>& nodes, int& bestLen, vector<Node
 		bestPath = path;
 		pathType = true;
 	}
+	
 	outfile << iter << "," << currBestLen << "," << antId << "," << len << ",";
 
 	for (size_t i = 0; i < path.size(); i++)
@@ -150,6 +162,7 @@ void AntColony::runAnt(Ant& ant, vector<Node*>& nodes, int& bestLen, vector<Node
 	}
 	
 	outfile << "," << pathType;
+	outfile << "," << getPhers(path) << "," << getPhers(bestPath);
 	
 	outfile << std::endl;
 
@@ -169,11 +182,11 @@ void AntColony::run()
 
 	if (!output_file.is_open())
 	{
-		throw FileReadError();
+		throw FileNotFoundError();
 		return;
 	}
 
-	output_file << "Iteration,CurrentBestLength,AntId,AntPathLength,AntPath,PathType" << std::endl;
+	output_file << "Iteration,CurrentBestLength,AntId,AntPathLength,AntPath,PathType,Phers,PhersOptimal" << std::endl;
 
 	int antId = 1;
 
@@ -185,9 +198,10 @@ void AntColony::run()
 			std::vector<Ant> ants;
 			initAnts(ants);
 			for (Ant& ant : ants)
-				runAnt(ant, nodes, bestLen, bestPath, i, antId++, output_file);
+				runAnt(ant, nodes, bestLen, bestPath, i, antId++, output_file);	
 		}
 	}
+
 
 	output_file.close();
 

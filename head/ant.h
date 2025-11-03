@@ -48,6 +48,9 @@ private:
 	// считаем путь
    	int computePathLength(const vector<Node*>& path) const;
 
+	// получаем количество феромонов с пути
+   	double getPhers(const vector<Node*>& path);
+
 	// инициализируем муравьёв (в одной пачке)
 	void initAnts(std::vector<Ant>& ants);
 
@@ -66,11 +69,12 @@ private:
 	// запуск одного муравья (с логированием)
 	void runAnt(Ant& ant, vector<Node*>& nodes, int& bestLen, vector<Node*>& bestPath, size_t& iter, const int& antId, std::ofstream& outfile);
 	
+	
 public:
 	AntColony(const Ic& aic, Graph& g);	
    	void run(); // запуск алгоритма
 };
 
-class FileReadError {};
+class FileNotFoundError {};
 
 #endif

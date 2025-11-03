@@ -1,31 +1,33 @@
 
 
-
-
 import pandas as pd
 import matplotlib.pyplot as pp
 import sys
  
 def pp_graphic(csv_file):
     df = pd.read_csv(csv_file);
-
-
-    df = df[df["PathType"] == 1].iloc[1:]
-    pp.scatter(
-        df['Iteration'], df['AntPathLength'], label='Длина пути, который прошел муравей'
+    df = df.iloc[1:];
+    print(
+        df.head(10)
     )
 
-    pp.scatter(
+    pp.plot(
+        df['Iteration'], df['Phers'], label='Феромоны на пройденном муравьем пути'
+    )
+    pp.plot(
+            df['Iteration'], df['PhersOptimal'], label='Феромоны на оптимальном пути'
+    )
+
+    pp.plot(
+            df['Iteration'], df['AntPathLength'], label='Длина пути, который прошел муравей'
+        )
+    
+    pp.plot(
             df['Iteration'], df['CurrentBestLength'], label='Лучшая длина пути на данный момент'
         )
-
-        
-    print(
-            df.head(10)
-        )    
-    pp.xlabel('Iteration')
-    pp.ylabel('Current Best Length');
-    pp.title('Работа алгоритма')
+     
+    pp.legend()
+    pp.title("Процесс работы алгоритма")
     pp.legend(loc='upper right', framealpha=0.9)
     pp.show()
 
@@ -50,4 +52,3 @@ Example: python main.py output.csv
 
 if __name__ == "__main__":
     main()
-

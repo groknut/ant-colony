@@ -20,5 +20,4 @@ type .\input\1.txt
 
 .\aco.exe config.ic
 
-uv run ./antpath.py ./output/output.csv
 uv run ./main.py ./output/output.csv
