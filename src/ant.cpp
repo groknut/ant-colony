@@ -104,9 +104,9 @@ void AntColony::runAnt(Ant& ant, vector<Node*>& nodes, int& bestLen, vector<Node
 
 	double len = computePathLength(path);
 	double currBestLen = bestLen;
-	bool pathType = false;
+	bool pathType = path.size() == nodes.size() + 1;
 
-	if (len < bestLen && path.size() == nodes.size() + 1)
+	if (len < bestLen && pathType)
 	{
 		bestLen = len;
 		bestPath = path;
