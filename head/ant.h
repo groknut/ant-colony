@@ -60,7 +60,7 @@ private:
 	// муравей строит путь
 	vector<Node*> buildAntPath(vector<Node*>& nodes, Ant& ant);
 
-	// обновляем феромоны
+	// обновляем феромоны на ребрах, которые прошел муравей
 	void updatePhers(vector<Node*>& path, const double& len, Ant& ant);
 
 	// запуск одного муравья (с логированием)
