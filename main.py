@@ -5,19 +5,44 @@ import matplotlib.pyplot as pp
 import sys
  
 def pp_graphic(csv_file):
+
     df = pd.read_csv(csv_file);
-    df = df.iloc[1:];
+    df = df[df['CurrentBestLength'] != 1e6];
+
+    # статистика
     print(
-        df.head(10)
+rf"""
+Записей в таблице: {len(df)} (считаем от нуля)
+Количество неполных путей: {len(df[df['PathType'] == 0])}
+Количество полных путей: {len(df[df['PathType'] == 1])}
+Количество итераций: {max(df['Iteration'])+1}
+Количество муравьев на одну итерацию: {max(df[df['Iteration'] == 0]['AntId'])}
+Найденные лучшие пути: {df['CurrentBestLength'].unique()}
+Максимальное количество феромона на оптимальном пути: {max(df['PhersOptimal'])}
+Минимальное количество феромона на оптимальном пути: {min(df['PhersOptimal'])}
+"""
     )
 
+    # рисуем 2 графика
+
+    pp.figure(figsize=(14,6))
+    
+    pp.subplot(121)
+    # Количество феромонов на оптимальном пути и пути, пройденном муравьем
     pp.plot(
         df['Iteration'], df['Phers'], label='Феромоны на пройденном муравьем пути'
     )
     pp.plot(
             df['Iteration'], df['PhersOptimal'], label='Феромоны на оптимальном пути'
     )
+    
+    pp.xlabel("Количество итераций")
+    pp.ylabel("Количество феромонов")
+    pp.legend(fontsize=8)
 
+    
+    pp.subplot(122)
+    # Длина оптимального пути по отношению к пройденному муравьем
     pp.plot(
             df['Iteration'], df['AntPathLength'], label='Длина пути, который прошел муравей'
         )
@@ -25,10 +50,17 @@ def pp_graphic(csv_file):
     pp.plot(
             df['Iteration'], df['CurrentBestLength'], label='Лучшая длина пути на данный момент'
         )
-     
-    pp.legend()
-    pp.title("Процесс работы алгоритма")
-    pp.legend(loc='upper right', framealpha=0.9)
+        
+    pp.xlabel("Количество итераций")
+    pp.ylabel("Длина пути")
+    pp.legend(loc='upper right', framealpha=0.9, fontsize=8)
+    
+    pp.suptitle('Процесс работы алгоритма', fontsize=16, y=0.98)
+
+    pp.subplots_adjust(wspace=0.6)
+
+    pp.savefig('output/graphic.png')
+    
     pp.show()
 
 def main():

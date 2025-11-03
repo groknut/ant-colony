@@ -186,22 +186,73 @@ void AntColony::run()
 		return;
 	}
 
+	double eps = ic.has("colony", "eps") ? ic.as_double("colony", "eps") : -1.0;
+
+	size_t n_iters = ic.has("colony", "n_iters") ? (size_t)ic.as_int("colony", "n_iters") : 0;
+
+	size_t max_iters = ic.has("colony", "max_iters") ? (size_t)ic.as_int("colony", "max_iters") : 1000;
+
 	output_file << "Iteration,CurrentBestLength,AntId,AntPathLength,AntPath,PathType,Phers,PhersOptimal" << std::endl;
 
 	int antId = 1;
 
-	for (size_t i = 0; i < (size_t)ic.as_int("colony", "iters"); i++)
-	{
-        size_t p = ic.has("colony", "packs") ? (size_t)ic.as_int("colony", "packs") : 1;
-		for (size_t j = 0; j < p; j++)
-		{
-			std::vector<Ant> ants;
-			initAnts(ants);
-			for (Ant& ant : ants)
-				runAnt(ant, nodes, bestLen, bestPath, i, antId++, output_file);	
-		}
-	}
+	size_t iters = (size_t)ic.as_int("colony", "iters");
 
+	if (!n_iters && eps < 0)
+	{
+		for (size_t i = 0; i < iters; i++)
+		{
+        	size_t p = ic.has("colony", "packs") ? (size_t)ic.as_int("colony", "packs") : 1;
+			for (size_t j = 0; j < p; j++)
+				{
+					std::vector<Ant> ants;
+					initAnts(ants);
+					for (Ant& ant : ants)
+						runAnt(ant, nodes, bestLen, bestPath, i, antId++, output_file);	
+				}
+		}	
+	}
+	
+	else
+	{
+		vector<Node*> lastBestPath;
+		double lastBestPathLen = bestLen;
+		
+		for (size_t i = 0; i < iters; i++)
+		{
+        	size_t p = ic.has("colony", "packs") ? (size_t)ic.as_int("colony", "packs") : 1;
+			for (size_t j = 0; j < p; j++)
+				{
+					std::vector<Ant> ants;
+					initAnts(ants);
+					for (Ant& ant : ants)
+						runAnt(ant, nodes, bestLen, bestPath, i, antId++, output_file);	
+				}
+		}
+
+		lastBestPath = bestPath;
+		lastBestPathLen = bestLen;
+		size_t sum_iter = iters;
+		for (size_t i = 0; i < n_iters && sum_iter <= max_iters; i++, sum_iter++)
+		{
+				
+	        	size_t p = ic.has("colony", "packs") ? (size_t)ic.as_int("colony", "packs") : 1;
+	        	for (size_t j = 0; j < p; j++)
+				{
+					std::vector<Ant> ants;
+					initAnts(ants);
+					for (Ant& ant : ants)
+						runAnt(ant, nodes, bestLen, bestPath, sum_iter, antId++, output_file);	
+				}
+
+				if (abs(lastBestPathLen - bestLen) > eps)
+				{
+					i = -1;
+					lastBestPath = bestPath;
+					lastBestPathLen = bestLen;	
+				}
+		}		
+	}
 
 	output_file.close();
 
