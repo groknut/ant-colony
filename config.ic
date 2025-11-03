@@ -1,4 +1,5 @@
 
+; Конфигурация для муравьиного алгоритма
 
 [graph]
 ; описание графа
@@ -33,4 +34,4 @@ max_iters: 100
 
 [output]
 csv файл, в который мы записываем путь каждого муравья
-output_file: ./output/output.csv ;
+output_file: ./output/output.csv
