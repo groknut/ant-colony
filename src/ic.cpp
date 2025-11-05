@@ -25,6 +25,8 @@ void Ic::load(const std::string& filename)
 
 	while (getline(in, line))
 		parse(line);
+
+	in.close();
 	
 }
 
