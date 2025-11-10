@@ -130,8 +130,9 @@ Iteration                             ...
 [100 rows x 6 columns]
 ```
 
-![Процесс работы алгоритма](./output/graphic.png)
-![Процесс работы алгоритма (параметры усреднены по итерациям)](./output/mean-graphic.png)
+![Процесс работы алгоритма](./output/graphic.png)>
+
+![Процесс работы алгоритма (параметры усреднены по итерациям)](./output/mean-graphic.png#center)
 
 **Описание работы:**
 ![Работа алгоритма](ant-algorithm.svg)
