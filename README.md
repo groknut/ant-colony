@@ -131,8 +131,10 @@ Iteration                             ...
 ```
 
 ![Процесс работы алгоритма](./output/graphic.png)
-<center>
+
+<div align="center">
 ![Процесс работы алгоритма (параметры усреднены по итерациям)](./output/mean-graphic.png)
-</center>
+</div>
+
 **Описание работы:**
 ![Работа алгоритма](ant-algorithm.svg)
