@@ -1,5 +1,5 @@
 [project]
-name = "ant-colony"
+name = "ant-colony-stat"
 version = "0.1.0"
 description = "Отображение работы алгоритма на графике"
 readme = "README.md"
