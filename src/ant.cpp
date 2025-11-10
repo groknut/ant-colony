@@ -10,7 +10,7 @@ AntColony::AntColony(const Ic& aic, Graph& g) : ic(aic), graph(g), rng(random_de
 
 void AntColony::initAnts(std::vector<Ant>& ants)
 {
-	for (size_t i = 0; i < (size_t)ic.as_int("colony", "nants"); i++)
+	for (int i = 0; i < ic.as_int("colony", "nants"); i++)
 		ants.emplace_back(
 			ic.as_double("ant", "alpha"),
 			ic.as_double("ant", "beta"),
@@ -136,7 +136,7 @@ vector<Node*> AntColony::buildAntPath(vector<Node*>& nodes, Ant& ant)
 	return path;
 }
 
-void AntColony::runAnt(Ant& ant, vector<Node*>& nodes, int& bestLen, vector<Node*>& bestPath, size_t& iter, const int& antId, std::ofstream& outfile)
+void AntColony::runAnt(Ant& ant, vector<Node*>& nodes, int& bestLen, vector<Node*>& bestPath, int& iter, const int& antId, std::ofstream& outfile)
 {
 
 	std::vector<Node*> path = buildAntPath(nodes, ant);
@@ -188,22 +188,22 @@ void AntColony::run()
 
 	double eps = ic.has("colony", "eps") ? ic.as_double("colony", "eps") : -1.0;
 
-	size_t n_iters = ic.has("colony", "n_iters") ? (size_t)ic.as_int("colony", "n_iters") : 0;
+	int n_iters = ic.has("colony", "n_iters") ? ic.as_int("colony", "n_iters") : 0;
 
-	size_t max_iters = ic.has("colony", "max_iters") ? (size_t)ic.as_int("colony", "max_iters") : 1000;
+	int max_iters = ic.has("colony", "max_iters") ? ic.as_int("colony", "max_iters") : 1000;
 
 	output_file << "Iteration,CurrentBestLength,AntId,AntPathLength,AntPath,PathType,Phers,PhersOptimal" << std::endl;
 
 	int antId = 1;
 
-	size_t iters = (size_t)ic.as_int("colony", "iters");
+	int iters = ic.as_int("colony", "iters");
+    int p = ic.has("colony", "packs") ? ic.as_int("colony", "packs") : 1;
 
 	if (!n_iters && eps < 0)
 	{
-		for (size_t i = 0; i < iters; i++)
+		for (int i = 0; i < iters; i++)
 		{
-        	size_t p = ic.has("colony", "packs") ? (size_t)ic.as_int("colony", "packs") : 1;
-			for (size_t j = 0; j < p; j++)
+			for (int j = 0; j < p; j++)
 				{
 					std::vector<Ant> ants;
 					initAnts(ants);
@@ -218,10 +218,9 @@ void AntColony::run()
 		vector<Node*> lastBestPath;
 		double lastBestPathLen = bestLen;
 		
-		for (size_t i = 0; i < iters; i++)
+		for (int i = 0; i < iters; i++)
 		{
-        	size_t p = ic.has("colony", "packs") ? (size_t)ic.as_int("colony", "packs") : 1;
-			for (size_t j = 0; j < p; j++)
+			for (int j = 0; j < p; j++)
 				{
 					std::vector<Ant> ants;
 					initAnts(ants);
@@ -232,25 +231,23 @@ void AntColony::run()
 
 		lastBestPath = bestPath;
 		lastBestPathLen = bestLen;
-		size_t sum_iter = iters;
-		for (size_t i = 0; i < n_iters && sum_iter <= max_iters; i++, sum_iter++)
+		int sum_iter = iters;
+		for (int i = 0; i < n_iters && sum_iter <= max_iters; i++, sum_iter++)
 		{
-				
-	        	size_t p = ic.has("colony", "packs") ? (size_t)ic.as_int("colony", "packs") : 1;
-	        	for (size_t j = 0; j < p; j++)
-				{
-					std::vector<Ant> ants;
-					initAnts(ants);
-					for (Ant& ant : ants)
-						runAnt(ant, nodes, bestLen, bestPath, sum_iter, antId++, output_file);	
-				}
+        	for (int j = 0; j < p; j++)
+			{
+				std::vector<Ant> ants;
+				initAnts(ants);
+				for (Ant& ant : ants)
+					runAnt(ant, nodes, bestLen, bestPath, sum_iter, antId++, output_file);	
+			}
 
-				if (abs(lastBestPathLen - bestLen) > eps)
-				{
-					i = -1;
-					lastBestPath = bestPath;
-					lastBestPathLen = bestLen;	
-				}
+			if (abs(lastBestPathLen - bestLen) > eps)
+			{
+				i = -1;
+				lastBestPath = bestPath;
+				lastBestPathLen = bestLen;	
+			}
 		}		
 	}
 

@@ -67,7 +67,7 @@ private:
 	void updatePhers(vector<Node*>& path, const double& len, Ant& ant);
 
 	// запуск одного муравья (с логированием)
-	void runAnt(Ant& ant, vector<Node*>& nodes, int& bestLen, vector<Node*>& bestPath, size_t& iter, const int& antId, std::ofstream& outfile);
+	void runAnt(Ant& ant, vector<Node*>& nodes, int& bestLen, vector<Node*>& bestPath, int& iter, const int& antId, std::ofstream& outfile);
 	
 	
 public:
