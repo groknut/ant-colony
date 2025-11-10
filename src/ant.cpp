@@ -154,7 +154,6 @@ void AntColony::runAnt(Ant& ant, vector<Node*>& nodes, int& bestLen, vector<Node
 	{
 		bestLen = len;
 		bestPath = path;
-		pathType = true;
 	}
 	
 	outfile << iter << "," << currBestLen << "," << antId << "," << len << ",";
