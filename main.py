@@ -83,7 +83,9 @@ rf"""
         
     pp.xlabel("Количество итераций")
     pp.ylabel("Параметры")
-    pp.legend(loc='upper right', framealpha=0.9, fontsize=8)
+
+    pp.legend()
+
     pp.title("Процесс работы алгоритма по итерациям")    
 
     pp.savefig('output/mean-graphic.png')
