@@ -68,8 +68,7 @@ private:
 
 	// запуск одного муравья (с логированием)
 	void runAnt(Ant& ant, vector<Node*>& nodes, int& bestLen, vector<Node*>& bestPath, int& iter, const int& antId, std::ofstream& outfile);
-	
-	
+		
 public:
 	AntColony(const Ic& aic, Graph& g);	
    	void run(); // запуск алгоритма

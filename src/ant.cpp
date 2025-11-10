@@ -20,10 +20,11 @@ void AntColony::initAnts(std::vector<Ant>& ants)
 
 void AntColony::initPher()
 {
+	double init_pher = ic.has("colony", "init") ? ic.as_double("colony", "init") : 1.0;	
 	for (auto& node : graph.get_nodes())
 		for (auto& other : graph.get_nodes())
 			if (node != other && node->isNeigh(other))
-				pher[make_pair(node, other)] = (ic.has("colony", "int") ? ic.as_double("colony", "init") : 1.0);	
+				pher[make_pair(node, other)] = init_pher;	
 }
 
 double AntColony::getPher(Node* a, Node* b) const
@@ -101,7 +102,9 @@ Node* AntColony::chooseNextNode(Node* current, const unordered_map<Node*, bool>&
 	{
 		if (visited.at(it->first))
 			continue;
+			
 		cum += calcProb(current, it->first, ant);
+
 		if (cum >= pick)
 			return it->first;
 	}
@@ -124,8 +127,10 @@ vector<Node*> AntColony::buildAntPath(vector<Node*>& nodes, Ant& ant)
 	while (path.size() < nodes.size()) 
 	{
 		Node* next = chooseNextNode(path.back(), visited, ant);
+
 		if (!next)
 			break;
+			
 		path.push_back(next);
 		visited[next] = true;
 	}
@@ -167,7 +172,6 @@ void AntColony::runAnt(Ant& ant, vector<Node*>& nodes, int& bestLen, vector<Node
 	outfile << std::endl;
 
 	updatePhers(path, len, ant);
-
 }
 
 void AntColony::run() 
@@ -181,10 +185,7 @@ void AntColony::run()
 	std::ofstream output_file(ic.getVal("output", "output_file"));
 
 	if (!output_file.is_open())
-	{
 		throw FileNotFoundError();
-		return;
-	}
 
 	double eps = ic.has("colony", "eps") ? ic.as_double("colony", "eps") : -1.0;
 
@@ -204,34 +205,35 @@ void AntColony::run()
 		for (int i = 0; i < iters; i++)
 		{
 			for (int j = 0; j < p; j++)
-				{
-					std::vector<Ant> ants;
-					initAnts(ants);
-					for (Ant& ant : ants)
-						runAnt(ant, nodes, bestLen, bestPath, i, antId++, output_file);	
-				}
+			{
+				std::vector<Ant> ants;
+				initAnts(ants);
+				for (Ant& ant : ants)
+					runAnt(ant, nodes, bestLen, bestPath, i, antId++, output_file);	
+			}
 		}	
 	}
 	
 	else
 	{
 		vector<Node*> lastBestPath;
-		double lastBestPathLen = bestLen;
-		
+		double lastBestPathLen;
+			
 		for (int i = 0; i < iters; i++)
 		{
 			for (int j = 0; j < p; j++)
-				{
-					std::vector<Ant> ants;
-					initAnts(ants);
-					for (Ant& ant : ants)
-						runAnt(ant, nodes, bestLen, bestPath, i, antId++, output_file);	
-				}
+			{
+				std::vector<Ant> ants;
+				initAnts(ants);
+				for (Ant& ant : ants)
+					runAnt(ant, nodes, bestLen, bestPath, i, antId++, output_file);	
+			}
 		}
 
 		lastBestPath = bestPath;
 		lastBestPathLen = bestLen;
 		int sum_iter = iters;
+		
 		for (int i = 0; i < n_iters && sum_iter <= max_iters; i++, sum_iter++)
 		{
         	for (int j = 0; j < p; j++)
