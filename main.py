@@ -3,11 +3,13 @@
 import pandas as pd
 import matplotlib.pyplot as pp
 import sys
- 
-def pp_graphic(csv_file):
+
+def pp_graphic(csv_file, param = False):
 
     df = pd.read_csv(csv_file);
-    df = df[df['CurrentBestLength'] != 1e6];
+    print(param)
+    if not param:
+        df = df[df['CurrentBestLength'] != 1e6];
 
     # статистика
     print(
@@ -96,22 +98,21 @@ rf"""
 
 def main():
 
-    if len(sys.argv) != 2:
+    if len(sys.argv) == 2:
+        f = sys.argv[1]
+        pp_graphic(f)
+        sys.exit(0);
+    elif len(sys.argv) == 3 and sys.argv[1] == "-p":
+        f = sys.argv[2]
+        pp_graphic(f, True)
+        sys.exit(0)
+    else:
         print(r"""
-Usage: python main,py <output_csv_file>
-Example: python main.py output.csv
-        """)
-        sys.exit(1);
-    f = sys.argv[1]
-    try:
-        pp_graphic(f);
-    except FileNotFoundError:
-        print(f"Error: File '{f}' not found ")     
-        sys.exit(1)   
-    except Exception as e:
-        print(f"Error: {e}")
-        sys.exit(1)
-    
+        Usage: python main,py <output_csv_file>
+        Example: python main.py output.csv
+                """)
+        sys.exit(0)
+            
 
 if __name__ == "__main__":
     main()
