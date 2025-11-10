@@ -133,7 +133,7 @@ Iteration                             ...
 ![Процесс работы алгоритма](./output/graphic.png)
 
 <div align="center">
-![Процесс работы алгоритма (параметры усреднены по итерациям)](./output/mean-graphic.png)
+<img src="./output/mean-graphic.png" alt="Процесс работы алгоритма (параметры усреднены по итерациям)">
 </div>
 
 **Описание работы:**
