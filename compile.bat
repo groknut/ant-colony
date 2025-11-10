@@ -14,10 +14,6 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-echo "1.txt" file
-type .\input\1.txt
-
-
 .\aco.exe config.ic
 
 if "%~1" == "" (
