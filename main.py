@@ -34,7 +34,7 @@ rf"""
     pp.subplot(121)
     # Количество феромонов на оптимальном пути и пути, пройденном муравьем
     pp.plot(
-        df['Iteration'], df['Phers'], label='Феромоны на пройденном муравьем пути'
+        df['Iteration'], df['Phers'], label='Глобальное количество феромонов'
     )
     pp.plot(
             df['Iteration'], df['PhersOptimal'], label='Феромоны на оптимальном пути'
