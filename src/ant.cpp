@@ -40,17 +40,17 @@ void AntColony::updatePher(Node* a, Node* b, double val)
 	pher[make_pair(a, b)] = val;
 }
 
-void AntColony::updatePhers(vector<Node*>& path, const double& len, Ant& ant)
+void AntColony::updatePhers(vector<Node*>& path, const double& len)
 {
 	for (size_t i = 0; i + 1 < path.size(); i++)
 	{
 		Node* a = path[i];
 		Node* b = path[i + 1];
-		updatePher(a, b, getPher(a, b) * (1 - ant.rho) + (ic.as_double("colony", "Q") / len));
+		updatePher(a, b, getPher(a, b) + (ic.as_double("colony", "Q") / len));
 	}
 }
 
-double AntColony::getPhers(const vector<Node*>& path)
+double AntColony::getPathPhers(const vector<Node*>& path)
 {
 	double res = 0;
 	for (size_t i = 0; i + 1 < path.size(); i++)
@@ -59,6 +59,14 @@ double AntColony::getPhers(const vector<Node*>& path)
 		Node* b = path[i + 1];
 		res += getPher(a, b);
 	}
+	return res;
+}
+
+double AntColony::getPhers()
+{
+	double res=0;
+	for (auto& [edge, pheromone] : pher)
+		res += pheromone;
 	return res;
 }
 
@@ -166,11 +174,17 @@ void AntColony::runAnt(Ant& ant, vector<Node*>& nodes, int& bestLen, vector<Node
 	}
 	
 	outfile << "," << pathType;
-	outfile << "," << getPhers(path) << "," << getPhers(bestPath);
+	outfile << "," << getPhers() << "," << getPathPhers(bestPath);
 	
 	outfile << std::endl;
 
-	updatePhers(path, len, ant);
+	updatePhers(path, len);
+}
+
+void AntColony::evaporate()
+{
+	for (auto& [edge, pheromone] : pher)
+		pheromone *= (1 - ic.as_double("ant", "rho"));
 }
 
 void AntColony::run() 
@@ -210,6 +224,7 @@ void AntColony::run()
 				for (Ant& ant : ants)
 					runAnt(ant, nodes, bestLen, bestPath, i, antId++, output_file);	
 			}
+			evaporate();
 		}	
 	}
 	
@@ -227,6 +242,7 @@ void AntColony::run()
 				for (Ant& ant : ants)
 					runAnt(ant, nodes, bestLen, bestPath, i, antId++, output_file);	
 			}
+			evaporate();
 		}
 
 		lastBestPath = bestPath;
@@ -249,6 +265,7 @@ void AntColony::run()
 				lastBestPath = bestPath;
 				lastBestPathLen = bestLen;	
 			}
+			evaporate();
 		}		
 	}
 

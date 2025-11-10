@@ -49,7 +49,8 @@ private:
    	int computePathLength(const vector<Node*>& path) const;
 
 	// получаем количество феромонов с пути
-   	double getPhers(const vector<Node*>& path);
+   	double getPathPhers(const vector<Node*>& path);
+   	double getPhers();
 
 	// инициализируем муравьёв (в одной пачке)
 	void initAnts(std::vector<Ant>& ants);
@@ -64,7 +65,9 @@ private:
 	vector<Node*> buildAntPath(vector<Node*>& nodes, Ant& ant);
 
 	// обновляем феромоны на ребрах, которые прошел муравей
-	void updatePhers(vector<Node*>& path, const double& len, Ant& ant);
+	void updatePhers(vector<Node*>& path, const double& len);
+
+	void evaporate();
 
 	// запуск одного муравья (с логированием)
 	void runAnt(Ant& ant, vector<Node*>& nodes, int& bestLen, vector<Node*>& bestPath, int& iter, const int& antId, std::ofstream& outfile);
