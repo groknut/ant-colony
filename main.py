@@ -23,6 +23,8 @@ rf"""
 """
     )
 
+    print(df)
+
     # рисуем 2 графика
 
     pp.figure(figsize=(14,6))
@@ -62,6 +64,33 @@ rf"""
     pp.savefig('output/graphic.png')
     
     pp.show()
+
+    df = df.groupby('Iteration').mean(numeric_only=True)
+
+    print(df)
+
+    # Длина оптимального пути по отношению к пройденному муравьем
+    pp.plot(
+            df.index, df['AntPathLength'], label='Длина пути, который прошел муравей'
+        )
+    
+    pp.plot(
+            df.index, df['CurrentBestLength'], label='Лучшая длина пути на данный момент'
+        )
+    pp.plot(
+            df.index, df['PhersOptimal'], label='Феромоны на оптимальном пути'
+    )
+        
+    pp.xlabel("Количество итераций")
+    pp.ylabel("Параметры")
+    pp.legend(loc='upper right', framealpha=0.9, fontsize=8)
+    pp.title("Процесс работы алгоритма по итерациям")    
+
+    pp.savefig('output/mean-graphic.png')
+    
+    pp.show()
+    
+
 
 def main():
 
