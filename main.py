@@ -4,13 +4,15 @@ import pandas as pd
 import matplotlib.pyplot as pp
 import sys
 
-def pp_graphic(csv_file, param = False):
+def pp_graphic(csv_file):
 
     df = pd.read_csv(csv_file);
-    print(param)
-    if not param:
-        df = df[df['CurrentBestLength'] != 1e6];
 
+    param = df[df['CurrentBestLength'] != 1e6].empty
+
+    if not param:
+        df = df[df['CurrentBestLength'] != 1e6]
+        
     # статистика
     print(
 rf"""
@@ -50,7 +52,6 @@ rf"""
     pp.plot(
             df['Iteration'], df['AntPathLength'], label='Длина пути, который прошел муравей'
         )
-    
     pp.plot(
             df['Iteration'], df['CurrentBestLength'], label='Лучшая длина пути на данный момент'
         )
@@ -102,10 +103,6 @@ def main():
         f = sys.argv[1]
         pp_graphic(f)
         sys.exit(0);
-    elif len(sys.argv) == 3 and sys.argv[1] == "-p":
-        f = sys.argv[2]
-        pp_graphic(f, True)
-        sys.exit(0)
     else:
         print(r"""
         Usage: python main,py <output_csv_file>
