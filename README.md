@@ -14,7 +14,7 @@ cd ant-colony
 ```bash
 uv sync
 ```
-3. Запустите проект
+3. **Запустите проект**
 ```bash
 uv run app.py
 ```
