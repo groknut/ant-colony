@@ -70,7 +70,7 @@ mean_graphic: ./output/mean_graphic.png
 
 #### Процесс работы алгоритма (параметры усреднены по итерациям)
 <div align="center">
-<img src="./assets/mean-graphic.png" alt="Процесс работы алгоритма (параметры усреднены по итерациям)">
+<img src="./assets/mean_graphic.png" alt="Процесс работы алгоритма (параметры усреднены по итерациям)">
 </div>
 
 #### Работа алгоритма
