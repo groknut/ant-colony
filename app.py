@@ -20,13 +20,9 @@ def timeit(func):
 	return wrapper
 
 class AntColonyApp:
-	def __init__(self, config_file="config.ic"):
+	def __init__(self, config_file="config.ini"):
 		self.config_file = Path(config_file)
-		self.config = configparser.ConfigParser(
-			delimiters=[':'],
-			comment_prefixes=[';'],  # строка начинается с ;
-			inline_comment_prefixes=[';']  # комментарий в конце строки
-		)
+		self.config = configparser.ConfigParser()
 
 		self.load_config()
 
@@ -58,7 +54,7 @@ class AntColonyApp:
 	def compile_cpp(self):
 		exe_path = str(Path(self.cpp_app).with_suffix('.exe'))  if os.name == "nt" else str(Path(self.cpp_app))
 		if not os.path.exists(exe_path):
-			sp.run(f"g++ main.cpp src/*.cpp -o {self.cpp_app}", shell=True)
+			sp.run(f"g++ -Ilibs/cfig  main.cpp src/*.cpp libs/cfig/cfig.cpp -o {self.cpp_app}", shell=True)
 
 	@timeit
 	def start_cpp(self):

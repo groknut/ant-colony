@@ -3,7 +3,7 @@
 #include <fstream>
 #include <string>
 
-#include "./head/ic.h"
+#include "cfig.h"
 #include "./head/graph.h"
 #include "./head/ant.h"
 
@@ -11,26 +11,11 @@ using namespace std;
 
 void helper(const string& program);
 
-int main(int argc, char** argv)
+int main()
 {
-
-	if (argc != 2)
-	{
-		helper(argv[0]);
-		return 0;
-	}
-		
-	Ic ic(argv[1]);
-	Graph graph(ic);
-
-	AntColony aco(ic, graph);
+	Cfig config("config.ini", Cfig::EQUAL, Cfig::HASH);
+	Graph graph(config);
+	AntColony aco(config, graph);
 	aco.run();
-	
     return 0;	
-}
-
-void helper(const string& program)
-{
-	cout << "Example:" << std::endl;
-	cout << program << "<file>: standard file reading (.ic format)" << std::endl;
 }
