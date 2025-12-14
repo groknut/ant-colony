@@ -1,0 +1,3 @@
+[submodule "libs/cfig"]
+	path = libs/cfig
+	url = https://github.com/groknut/cfig
