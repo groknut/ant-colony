@@ -3,54 +3,52 @@
 
 Ant::Ant(double a, double b, double r) : alpha(a), beta(b), rho(r) {}
 
-AntColony::AntColony(const Cfig& cfig, Graph& g) : config(cfig), graph(g), rng(random_device{}())
+ACO::ACO(const Cfig& cfig, Graph& g) : config(cfig), graph(g), rng(random_device{}())
 {
 	initPher();
 }
 
-void AntColony::initAnts(std::vector<Ant>& ants)
+void AntColony::initAnts(std::vector<double> params)
 {
-	for (int i = 0; i < config("colony", "nants").toInt(); i++)
+	for (int i = 0; i < nants; i++)
 		ants.emplace_back(
-			config("ant", "alpha").toDouble(),
-			config("ant", "beta").toDouble(),
-			config("ant", "rho").toDouble()
+			params[0], params[1], params[2]
 		);
 }
 
-void AntColony::initPher()
+void ACO::initPher()
 {
-	double init_pher = config.get<double>("colony", "init", 1.0);	
+	double init_pher = config.get<double>("aco", "init", 1.0);	
 	for (auto& node : graph.get_nodes())
 		for (auto& other : graph.get_nodes())
 			if (node != other && node->isNeigh(other))
 				pher[make_pair(node, other)] = init_pher;	
 }
 
-double AntColony::getPher(Node* a, Node* b) const
+double ACO::getPher(Node* a, Node* b) const
 {
 	auto it = pher.find(make_pair(a, b));
 	if (it != pher.end())
 		return it->second;
-	return config("colony", "init").toDouble();
+	return config("aco", "init").toDouble();
 }
 
-void AntColony::updatePher(Node* a, Node* b, double val)
+void ACO::updatePher(Node* a, Node* b, double val)
 {
 	pher[make_pair(a, b)] = val;
 }
 
-void AntColony::updatePhers(vector<Node*>& path, const double& len)
+void ACO::updatePhers(vector<Node*>& path, const double& len)
 {
 	for (size_t i = 0; i + 1 < path.size(); i++)
 	{
 		Node* a = path[i];
 		Node* b = path[i + 1];
-		updatePher(a, b, getPher(a, b) + (config("colony", "Q").toDouble() / len));
+		updatePher(a, b, getPher(a, b) + (config("aco", "Q").toDouble() / len));
 	}
 }
 
-double AntColony::getPathPhers(const vector<Node*>& path)
+double ACO::getPathPhers(const vector<Node*>& path)
 {
 	double res = 0;
 	for (size_t i = 0; i + 1 < path.size(); i++)
@@ -62,7 +60,7 @@ double AntColony::getPathPhers(const vector<Node*>& path)
 	return res;
 }
 
-double AntColony::getPhers()
+double ACO::getPhers()
 {
 	double res=0;
 	for (auto& [edge, pheromone] : pher)
@@ -70,7 +68,7 @@ double AntColony::getPhers()
 	return res;
 }
 
-int AntColony::computePathLength(const vector<Node*>& path) const {
+int ACO::computePathLength(const vector<Node*>& path) const {
    	int length = 0;
    	for (size_t i = 0; i + 1 < path.size(); i++) {
        	Node* a = path[i];
@@ -80,7 +78,7 @@ int AntColony::computePathLength(const vector<Node*>& path) const {
    	return length;
 }
 
-double AntColony::calcProb(Node* curr, Node* neigh, const Ant& ant)
+double ACO::calcProb(Node* curr, Node* neigh, const Ant& ant)
 {
 	return pow(
 		getPher(curr, neigh), ant.alpha
@@ -89,7 +87,7 @@ double AntColony::calcProb(Node* curr, Node* neigh, const Ant& ant)
 	);
 }
 
-Node* AntColony::chooseNextNode(Node* current, const unordered_map<Node*, bool>& visited, const Ant& ant)
+Node* ACO::chooseNextNode(Node* current, const unordered_map<Node*, bool>& visited, const Ant& ant)
 {
 
 	double total = 0.0;
@@ -120,7 +118,7 @@ Node* AntColony::chooseNextNode(Node* current, const unordered_map<Node*, bool>&
 	return select;	
 }
 
-vector<Node*> AntColony::buildAntPath(vector<Node*>& nodes, Ant& ant)
+vector<Node*> ACO::buildAntPath(vector<Node*>& nodes, Ant& ant)
 {
 	unordered_map<Node*, bool> visited;
 	std::vector<Node*> path;
@@ -149,7 +147,7 @@ vector<Node*> AntColony::buildAntPath(vector<Node*>& nodes, Ant& ant)
 	return path;
 }
 
-void AntColony::runAnt(Ant& ant, vector<Node*>& nodes, int& bestLen, vector<Node*>& bestPath, int& iter, const int& antId, std::ofstream& outfile)
+void ACO::runAnt(Ant& ant, vector<Node*>& nodes, int& bestLen, vector<Node*>& bestPath, int& iter, const int& antId, std::ofstream& outfile)
 {
 
 	std::vector<Node*> path = buildAntPath(nodes, ant);
@@ -181,13 +179,13 @@ void AntColony::runAnt(Ant& ant, vector<Node*>& nodes, int& bestLen, vector<Node
 	updatePhers(path, len);
 }
 
-void AntColony::evaporate()
+void ACO::evaporate()
 {
 	for (auto& [edge, pheromone] : pher)
 		pheromone *= (1 - config("ant", "rho").toDouble());
 }
 
-void AntColony::run() 
+void ACO::run() 
 {
 	set<Node*> nodeSet = graph.get_nodes();
 	vector<Node*> nodes(nodeSet.begin(), nodeSet.end());
@@ -200,18 +198,26 @@ void AntColony::run()
 	if (!output_file.is_open())
 		throw FileNotFoundError();
 
-	double eps = config.get<double>("colony", "eps", -1.0);
+	double eps = config.get<double>("aco", "eps", -1.0);
 
-	int n_iters = config.get<int>("colony", "n_iters", 0);
+	int n_iters = config.get<int>("aco", "n_iters", 0);
 
-	int max_iters = config.get<int>("colony", "max_iters", 1000);
+	int max_iters = config.get<int>("aco", "max_iters", 1000);
 
 	output_file << "Iteration,CurrentBestLength,AntId,AntPathLength,AntPath,PathType,Phers,PhersOptimal" << std::endl;
 
 	int antId = 1;
 
-	int iters = config("colony", "iters").toInt();
-    int p = config.get<int>("colony", "packs", 1);
+	int iters = config("aco", "iters").toInt();
+    int p = config.get<int>("aco", "packs", 1);
+
+    std::vector<double> params = {
+		config("ant", "alpha").toDouble(),
+		config("ant", "beta").toDouble(),
+		config("ant", "rho").toDouble()    	
+    };
+
+    int nants = config("colony", "nants").toInt();
 
 	if (!n_iters && eps < 0)
 	{
@@ -219,9 +225,9 @@ void AntColony::run()
 		{
 			for (int j = 0; j < p; j++)
 			{
-				std::vector<Ant> ants;
-				initAnts(ants);
-				for (Ant& ant : ants)
+				AntColony colony(nants);
+				colony.initAnts(params);
+				for (Ant& ant : colony.ants)
 					runAnt(ant, nodes, bestLen, bestPath, i, antId++, output_file);	
 			}
 			evaporate();
@@ -237,9 +243,9 @@ void AntColony::run()
 		{
 			for (int j = 0; j < p; j++)
 			{
-				std::vector<Ant> ants;
-				initAnts(ants);
-				for (Ant& ant : ants)
+				AntColony colony(nants);
+				colony.initAnts(params);
+				for (Ant& ant : colony.ants)
 					runAnt(ant, nodes, bestLen, bestPath, i, antId++, output_file);	
 			}
 			evaporate();
@@ -253,9 +259,9 @@ void AntColony::run()
 		{
         	for (int j = 0; j < p; j++)
 			{
-				std::vector<Ant> ants;
-				initAnts(ants);
-				for (Ant& ant : ants)
+				AntColony colony(nants);
+				colony.initAnts(params);
+				for (Ant& ant : colony.ants)
 					runAnt(ant, nodes, bestLen, bestPath, sum_iter, antId++, output_file);	
 			}
 

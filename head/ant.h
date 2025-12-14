@@ -25,7 +25,16 @@ struct Ant {
    	Ant(double a, double b, double r);
 };
 
-class AntColony {
+struct AntColony
+{
+	std::vector<Ant> ants;
+	int nants;
+	AntColony(const int& nants_) : nants(nants_) {}
+	// инициализируем муравьёв (в одной пачке)
+	void initAnts(std::vector<double> params);
+};
+
+class ACO {
 
 private:
    	Graph& graph; // сам граф (чтобы не создавать его внутри колонии)
@@ -52,9 +61,6 @@ private:
    	double getPathPhers(const vector<Node*>& path);
    	double getPhers();
 
-	// инициализируем муравьёв (в одной пачке)
-	void initAnts(std::vector<Ant>& ants);
-
 	// считаем вероятность выбора пути муравьем
 	double calcProb(Node* curr, Node* neigh, const Ant& ant);
 
@@ -73,7 +79,7 @@ private:
 	void runAnt(Ant& ant, vector<Node*>& nodes, int& bestLen, vector<Node*>& bestPath, int& iter, const int& antId, std::ofstream& outfile);
 		
 public:
-	AntColony(const Cfig& cfig, Graph& g);	
+	ACO(const Cfig& cfig, Graph& g);	
    	void run(); // запуск алгоритма
 };
 
