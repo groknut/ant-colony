@@ -3,24 +3,24 @@
 
 Ant::Ant(double a, double b, double r) : alpha(a), beta(b), rho(r) {}
 
-AntColony::AntColony(const Ic& aic, Graph& g) : ic(aic), graph(g), rng(random_device{}())
+AntColony::AntColony(const Cfig& cfig, Graph& g) : config(cfig), graph(g), rng(random_device{}())
 {
 	initPher();
 }
 
 void AntColony::initAnts(std::vector<Ant>& ants)
 {
-	for (int i = 0; i < ic.as_int("colony", "nants"); i++)
+	for (int i = 0; i < config("colony", "nants").toInt(); i++)
 		ants.emplace_back(
-			ic.as_double("ant", "alpha"),
-			ic.as_double("ant", "beta"),
-			ic.as_double("ant", "rho")
+			config("ant", "alpha").toDouble(),
+			config("ant", "beta").toDouble(),
+			config("ant", "rho").toDouble()
 		);
 }
 
 void AntColony::initPher()
 {
-	double init_pher = ic.has("colony", "init") ? ic.as_double("colony", "init") : 1.0;	
+	double init_pher = config.get<double>("colony", "init", 1.0);	
 	for (auto& node : graph.get_nodes())
 		for (auto& other : graph.get_nodes())
 			if (node != other && node->isNeigh(other))
@@ -32,7 +32,7 @@ double AntColony::getPher(Node* a, Node* b) const
 	auto it = pher.find(make_pair(a, b));
 	if (it != pher.end())
 		return it->second;
-	return ic.as_double("colony", "init");
+	return config("colony", "init").toDouble();
 }
 
 void AntColony::updatePher(Node* a, Node* b, double val)
@@ -46,7 +46,7 @@ void AntColony::updatePhers(vector<Node*>& path, const double& len)
 	{
 		Node* a = path[i];
 		Node* b = path[i + 1];
-		updatePher(a, b, getPher(a, b) + (ic.as_double("colony", "Q") / len));
+		updatePher(a, b, getPher(a, b) + (config("colony", "Q").toDouble() / len));
 	}
 }
 
@@ -184,7 +184,7 @@ void AntColony::runAnt(Ant& ant, vector<Node*>& nodes, int& bestLen, vector<Node
 void AntColony::evaporate()
 {
 	for (auto& [edge, pheromone] : pher)
-		pheromone *= (1 - ic.as_double("ant", "rho"));
+		pheromone *= (1 - config("ant", "rho").toDouble());
 }
 
 void AntColony::run() 
@@ -195,23 +195,23 @@ void AntColony::run()
 	int bestLen = paraml;
 	vector<Node*> bestPath;
 
-	std::ofstream output_file(ic.getVal("output", "output_file"));
+	std::ofstream output_file(config("output", "output_file"));
 
 	if (!output_file.is_open())
 		throw FileNotFoundError();
 
-	double eps = ic.has("colony", "eps") ? ic.as_double("colony", "eps") : -1.0;
+	double eps = config.get<double>("colony", "eps", -1.0);
 
-	int n_iters = ic.has("colony", "n_iters") ? ic.as_int("colony", "n_iters") : 0;
+	int n_iters = config.get<int>("colony", "n_iters", 0);
 
-	int max_iters = ic.has("colony", "max_iters") ? ic.as_int("colony", "max_iters") : 1000;
+	int max_iters = config.get<int>("colony", "max_iters", 1000);
 
 	output_file << "Iteration,CurrentBestLength,AntId,AntPathLength,AntPath,PathType,Phers,PhersOptimal" << std::endl;
 
 	int antId = 1;
 
-	int iters = ic.as_int("colony", "iters");
-    int p = ic.has("colony", "packs") ? ic.as_int("colony", "packs") : 1;
+	int iters = config("colony", "iters").toInt();
+    int p = config.get<int>("colony", "packs", 1);
 
 	if (!n_iters && eps < 0)
 	{

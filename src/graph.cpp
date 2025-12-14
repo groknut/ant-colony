@@ -1,19 +1,19 @@
 #include "../head/graph.h"
 
-Graph::Graph(const Ic& ic)
+Graph::Graph(const Cfig& cfig)
 {
-	ifstream in(ic.getVal("graph", "file"));
+	ifstream in(cfig("graph", "file"));
 
 	if (!in.is_open())
 		throw GraphReadError();
 		
-	if (ic.as_bool("graph", "head"))
+	if (cfig("graph", "head").toBool())
 	{
 		string s;
 		getline(in, s);
 	}
 
-	oriented = ic.as_bool("graph", "oriented");
+	oriented = cfig("graph", "oriented").toBool();
 
 	string a, b;
     int c;

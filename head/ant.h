@@ -12,7 +12,7 @@
 
 #include "graph.h"
 #include "node.h"
-#include "ic.h"
+#include "cfig.h"
 
 using namespace std;
 
@@ -29,7 +29,7 @@ class AntColony {
 
 private:
    	Graph& graph; // сам граф (чтобы не создавать его внутри колонии)
-   	const Ic& ic; // наша конфигурация
+   	const Cfig& config; // наша конфигурация
    	mt19937 rng; // генератор псевдослучайных чисел
 
    	// ассоциативный массив
@@ -73,7 +73,7 @@ private:
 	void runAnt(Ant& ant, vector<Node*>& nodes, int& bestLen, vector<Node*>& bestPath, int& iter, const int& antId, std::ofstream& outfile);
 		
 public:
-	AntColony(const Ic& aic, Graph& g);	
+	AntColony(const Cfig& cfig, Graph& g);	
    	void run(); // запуск алгоритма
 };
 

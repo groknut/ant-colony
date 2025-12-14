@@ -6,7 +6,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "ic.h"
+#include "cfig.h"
 #include "node.h"
 
 using namespace std;
@@ -20,7 +20,7 @@ class Graph
 
 public:
 	// конструкторы и деструктор
-	Graph(const Ic& ic);
+	Graph(const Cfig& cfig);
 	Graph() {};
     ~Graph();
 
