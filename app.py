@@ -60,7 +60,7 @@ class AntColonyApp:
 	def start_cpp(self):
 		exe_path = str(Path(self.cpp_app).with_suffix('.exe'))  if os.name == "nt" else str(Path(self.cpp_app))
 		sp.run(
-		f"{exe_path} {self.config_file}", shell=True
+		f"{exe_path}", shell=True
 		)
 
 	@timeit
