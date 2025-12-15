@@ -28,10 +28,7 @@ struct Ant {
 struct AntColony
 {
 	std::vector<Ant> ants;
-	int nants;
-	AntColony(const int& nants_) : nants(nants_) {}
-	// инициализируем муравьёв (в одной пачке)
-	void initAnts(std::vector<double> params);
+    AntColony(const Cfig& config);
 };
 
 class ACO {
@@ -73,7 +70,7 @@ private:
 	// обновляем феромоны на ребрах, которые прошел муравей
 	void updatePhers(vector<Node*>& path, const double& len);
 
-	void evaporate();
+	void evaporate(AntColony& colony);
 
 	// запуск одного муравья (с логированием)
 	void runAnt(Ant& ant, vector<Node*>& nodes, int& bestLen, vector<Node*>& bestPath, int& iter, const int& antId, std::ofstream& outfile);

@@ -8,12 +8,20 @@ ACO::ACO(const Cfig& cfig, Graph& g) : config(cfig), graph(g), rng(random_device
 	initPher();
 }
 
-void AntColony::initAnts(std::vector<double> params)
+AntColony::AntColony(const Cfig& config)
 {
-	for (int i = 0; i < nants; i++)
-		ants.emplace_back(
-			params[0], params[1], params[2]
-		);
+    for (const auto& section : config.sections())
+    {        
+        if (section.find(".ant") != std::string::npos)
+        {
+            for (int i = 0; i < config("colony", section).toInt(); i++)
+            ants.emplace_back(
+                config(section, "alpha").toDouble(),
+                config(section, "beta").toDouble(),
+                config(section, "rho").toDouble()   
+            );
+        }
+    }
 }
 
 void ACO::initPher()
@@ -179,10 +187,16 @@ void ACO::runAnt(Ant& ant, vector<Node*>& nodes, int& bestLen, vector<Node*>& be
 	updatePhers(path, len);
 }
 
-void ACO::evaporate()
+void ACO::evaporate(AntColony& colony)
 {
+
+    double rho = 0;
+    for (auto& ant : colony.ants)
+        rho += ant.rho;
+    rho /= colony.ants.size();
+
 	for (auto& [edge, pheromone] : pher)
-		pheromone *= (1 - config("ant", "rho").toDouble());
+		pheromone *= (1 - rho);
 }
 
 void ACO::run() 
@@ -209,28 +223,15 @@ void ACO::run()
 	int antId = 1;
 
 	int iters = config("aco", "iters").toInt();
-    int p = config.get<int>("aco", "packs", 1);
-
-    std::vector<double> params = {
-		config("ant", "alpha").toDouble(),
-		config("ant", "beta").toDouble(),
-		config("ant", "rho").toDouble()    	
-    };
-
-    int nants = config("colony", "nants").toInt();
 
 	if (!n_iters && eps < 0)
 	{
 		for (int i = 0; i < iters; i++)
 		{
-			for (int j = 0; j < p; j++)
-			{
-				AntColony colony(nants);
-				colony.initAnts(params);
-				for (Ant& ant : colony.ants)
-					runAnt(ant, nodes, bestLen, bestPath, i, antId++, output_file);	
-			}
-			evaporate();
+            AntColony colony(config);
+            for (Ant& ant : colony.ants)
+                runAnt(ant, nodes, bestLen, bestPath, i, antId++, output_file);	
+			evaporate(colony);
 		}	
 	}
 	
@@ -241,14 +242,10 @@ void ACO::run()
 			
 		for (int i = 0; i < iters; i++)
 		{
-			for (int j = 0; j < p; j++)
-			{
-				AntColony colony(nants);
-				colony.initAnts(params);
-				for (Ant& ant : colony.ants)
-					runAnt(ant, nodes, bestLen, bestPath, i, antId++, output_file);	
-			}
-			evaporate();
+            AntColony colony(config);
+            for (Ant& ant : colony.ants)
+                runAnt(ant, nodes, bestLen, bestPath, i, antId++, output_file);	
+            evaporate(colony);
 		}
 
 		lastBestPath = bestPath;
@@ -257,13 +254,9 @@ void ACO::run()
 		
 		for (int i = 0; i < n_iters && sum_iter <= max_iters; i++, sum_iter++)
 		{
-        	for (int j = 0; j < p; j++)
-			{
-				AntColony colony(nants);
-				colony.initAnts(params);
-				for (Ant& ant : colony.ants)
-					runAnt(ant, nodes, bestLen, bestPath, sum_iter, antId++, output_file);	
-			}
+            AntColony colony(config);
+            for (Ant& ant : colony.ants)
+                runAnt(ant, nodes, bestLen, bestPath, sum_iter, antId++, output_file);	
 
 			if (abs(lastBestPathLen - bestLen) > eps)
 			{
@@ -271,7 +264,7 @@ void ACO::run()
 				lastBestPath = bestPath;
 				lastBestPathLen = bestLen;	
 			}
-			evaporate();
+            evaporate(colony);
 		}		
 	}
 
