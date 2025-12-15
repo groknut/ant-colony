@@ -10,17 +10,14 @@ ACO::ACO(const Cfig& cfig, Graph& g) : config(cfig), graph(g), rng(random_device
 
 AntColony::AntColony(const Cfig& config)
 {
-    for (const auto& section : config.sections())
+    for (const auto& ant_type : config.keys("colony"))
     {        
-        if (section.find(".ant") != std::string::npos)
-        {
-            for (int i = 0; i < config("colony", section).toInt(); i++)
-                ants.emplace_back(
-                    config(section, "alpha").toDouble(),
-                    config(section, "beta").toDouble(),
-                    config(section, "rho").toDouble()   
-                );
-        }
+        for (int i = 0; i < config("colony", ant_type).toInt(); i++)
+            ants.emplace_back(
+                config(ant_type, "alpha").toDouble(),
+                config(ant_type, "beta").toDouble(),
+                config(ant_type, "rho").toDouble()   
+            );
     }
 }
 
