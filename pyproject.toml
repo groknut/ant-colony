@@ -1,5 +1,5 @@
 [project]
-name = "ACO algorithm"
+name = "ACO"
 version = "0.1.0"
 description = "ACO"
 readme = "README.md"
