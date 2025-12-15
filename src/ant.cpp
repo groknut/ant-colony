@@ -15,11 +15,11 @@ AntColony::AntColony(const Cfig& config)
         if (section.find(".ant") != std::string::npos)
         {
             for (int i = 0; i < config("colony", section).toInt(); i++)
-            ants.emplace_back(
-                config(section, "alpha").toDouble(),
-                config(section, "beta").toDouble(),
-                config(section, "rho").toDouble()   
-            );
+                ants.emplace_back(
+                    config(section, "alpha").toDouble(),
+                    config(section, "beta").toDouble(),
+                    config(section, "rho").toDouble()   
+                );
         }
     }
 }
