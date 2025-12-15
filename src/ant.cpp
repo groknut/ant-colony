@@ -1,7 +1,7 @@
 
 #include "../head/ant.h"
 
-Ant::Ant(double a, double b, double r) : alpha(a), beta(b), rho(r) {}
+Ant::Ant(double a, double b, double r, std::string ant_type) : alpha(a), beta(b), rho(r), type(ant_type) {}
 
 ACO::ACO(const Cfig& cfig, Graph& g) : config(cfig), graph(g), rng(random_device{}())
 {
@@ -16,7 +16,8 @@ AntColony::AntColony(const Cfig& config)
             ants.emplace_back(
                 config(ant_type, "alpha").toDouble(),
                 config(ant_type, "beta").toDouble(),
-                config(ant_type, "rho").toDouble()   
+                config(ant_type, "rho").toDouble(),
+                ant_type.substr(0, ant_type.size() - ant_type.find(".ant"))
             );
     }
 }
@@ -167,7 +168,7 @@ void ACO::runAnt(Ant& ant, vector<Node*>& nodes, int& bestLen, vector<Node*>& be
 		bestPath = path;
 	}
 	
-	outfile << iter << "," << currBestLen << "," << antId << "," << len << ",";
+	outfile << iter << "," << currBestLen << "," << antId << "," << ant.type << "," << len << ",";
 
 	for (size_t i = 0; i < path.size(); i++)
 	{
@@ -215,7 +216,7 @@ void ACO::run()
 
 	int max_iters = config.get<int>("aco", "max_iters", 1000);
 
-	output_file << "Iteration,CurrentBestLength,AntId,AntPathLength,AntPath,PathType,Phers,PhersOptimal" << std::endl;
+	output_file << "Iteration,CurrentBestLength,AntId,AntType,AntPathLength,AntPath,PathType,Phers,PhersOptimal" << std::endl;
 
 	int antId = 1;
 

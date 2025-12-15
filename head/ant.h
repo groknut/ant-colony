@@ -22,7 +22,8 @@ struct Ant {
 	// параметр, контролирующий влияние привлекательности ребра
 	// скорость испарения феромона
 	double alpha, beta, rho;
-   	Ant(double a, double b, double r);
+    std::string type;
+   	Ant(double a, double b, double r, std::string ant_type);
 };
 
 struct AntColony
