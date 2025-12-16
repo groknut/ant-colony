@@ -10,16 +10,21 @@ ACO::ACO(const Cfig& cfig, Graph& g) : config(cfig), graph(g), rng(random_device
 
 AntColony::AntColony(const Cfig& config)
 {
+    const std::string suffix = ".ant";
     for (const auto& ant_type : config.keys("colony"))
-    {        
+    {
+        if (ant_type.size() < suffix.size() || ant_type.compare(ant_type.size() - suffix.size(), suffix.size(), suffix) != 0)
+            continue;
+
+        std::string antType = ant_type.substr(0, ant_type.size() - suffix.size());
+
         for (int i = 0; i < config("colony", ant_type).toInt(); i++)
-            if (ant_type.find(".ant") != std::string::npos)
-                ants.emplace_back(
-                    config(ant_type, "alpha").toDouble(),
-                    config(ant_type, "beta").toDouble(),
-                    config(ant_type, "rho").toDouble(),
-                    ant_type.substr(0, ant_type.size() - ant_type.find(".ant"))
-                );
+            ants.emplace_back(
+                config(ant_type, "alpha").toDouble(),
+                config(ant_type, "beta").toDouble(),
+                config(ant_type, "rho").toDouble(),
+                antType
+            );
     }
 }
 
