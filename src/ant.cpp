@@ -13,12 +13,13 @@ AntColony::AntColony(const Cfig& config)
     for (const auto& ant_type : config.keys("colony"))
     {        
         for (int i = 0; i < config("colony", ant_type).toInt(); i++)
-            ants.emplace_back(
-                config(ant_type, "alpha").toDouble(),
-                config(ant_type, "beta").toDouble(),
-                config(ant_type, "rho").toDouble(),
-                ant_type.substr(0, ant_type.size() - ant_type.find(".ant"))
-            );
+            if (ant_type.find(".ant") != std::string::npos)
+                ants.emplace_back(
+                    config(ant_type, "alpha").toDouble(),
+                    config(ant_type, "beta").toDouble(),
+                    config(ant_type, "rho").toDouble(),
+                    ant_type.substr(0, ant_type.size() - ant_type.find(".ant"))
+                );
     }
 }
 
