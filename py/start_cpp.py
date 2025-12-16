@@ -7,30 +7,23 @@ import sys
 from config import timeit
 
 @timeit
-def compile_cpp(output_file):
+def compile_cpp():
 
-    exe_path = str(Path(output_file).with_suffix('.exe'))  if os.name == "nt" else str(Path(output_file))
+    exe_path = "main.exe"  if os.name == "nt" else "main"
 
     if not os.path.exists(exe_path):
-        sp.run(f"g++ main.cpp src/*.cpp -o {output_file}", shell=True)
+        sp.run(f"g++ -Ilibs/cfig  main.cpp src/*.cpp libs/cfig/cfig.cpp -o main", shell=True)
 
 @timeit
-def start_cpp(output_file, config_file):
-
-    exe_path = str(Path(output_file).with_suffix('.exe'))  if os.name == "nt" else str(Path(output_file))
+def start_cpp():
+    exe_path = "main.exe"  if os.name == "nt" else "main"
     sp.run(
-        f"{output_file} {config_file}", shell=True
+        f"{exe_path}", shell=True
     )
 
 def main():
-    if len(sys.argv) != 3:
-        print(f"""
-Usage: python {sys.argv[0]} <output_file> <config_file>
-Example: python {sys.argv[0]} main config.ic
-        """)
-    else:
-        compile_cpp(sys.argv[1])
-        start_cpp(sys.argv[1], sys.argv[2])
+    compile_cpp()
+    start_cpp()
 
 if __name__ == "__main__":
     main()
