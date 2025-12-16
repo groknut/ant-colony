@@ -11,6 +11,10 @@
 6. Короткий маршрут станет более привлекательным
 7. Длинные пути, в конечном итоге, исчезнут из-за испарения феромонов
 
+### Работа алгоритма
+![Структура](./assets/structure.drawio.png)
+
+![Работа алгоритма](./assets/algorithm.drawio.png)
 
 ### Начало работы
 1. **Склонируйте проект**
@@ -85,10 +89,3 @@ mean_graphic = ./output/mean_graphic.png
 <div align="center">
 <img src="./assets/mean_graphic.png" alt="Процесс работы алгоритма (параметры усреднены по итерациям)">
 </div>
-
-#### Работа алгоритма
-![Структура](./assets/structure.drawio.png)
-
-![Работа алгоритма](./assets/algorithm.drawio.png)
-
-
