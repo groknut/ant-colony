@@ -12,9 +12,13 @@
 7. Длинные пути, в конечном итоге, исчезнут из-за испарения феромонов
 
 ### Работа алгоритма
-![Структура](./assets/structure.drawio.png)
+<div align="center">
+<img src="./assets/structure.drawio.png" alt="Структура">
+</div>
 
-![Работа алгоритма](./assets/algorithm.drawio.png)
+<div align="center">
+<img src="./assets/algorithm.drawio.png" alt="Алгоритм">
+</div>
 
 ### Начало работы
 1. **Склонируйте проект**
