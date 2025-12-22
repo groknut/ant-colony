@@ -193,7 +193,6 @@ void ACO::runAnt(Ant& ant, vector<Node*>& nodes, int& bestLen, vector<Node*>& be
 
 void ACO::evaporate(AntColony& colony)
 {
-
     double rho = 0;
     for (auto& ant : colony.ants)
         rho += ant.rho;
@@ -211,9 +210,9 @@ void ACO::run()
 	int bestLen = paraml;
 	vector<Node*> bestPath;
 
-	std::ofstream output_file(config("output", "output_file"));
+	std::ofstream stat_file(config("output", "statistic"));
 
-	if (!output_file.is_open())
+	if (!stat_file.is_open())
 		throw FileNotFoundError();
 
 	double eps = config.get<double>("aco", "eps", -1.0);
@@ -222,7 +221,7 @@ void ACO::run()
 
 	int max_iters = config.get<int>("aco", "max_iters", 1000);
 
-	output_file << "Iteration,CurrentBestLength,AntId,AntType,AntPathLength,AntPath,PathType,Phers,PhersOptimal" << std::endl;
+	stat_file << "Iteration,CurrentBestLength,AntId,AntType,AntPathLength,AntPath,PathType,Phers,PhersOptimal" << std::endl;
 
 	int antId = 1;
 
@@ -234,7 +233,7 @@ void ACO::run()
 		{
             AntColony colony(config);
             for (Ant& ant : colony.ants)
-                runAnt(ant, nodes, bestLen, bestPath, i, antId++, output_file);	
+                runAnt(ant, nodes, bestLen, bestPath, i, antId++, stat_file);	
 			evaporate(colony);
 		}	
 	}
@@ -248,7 +247,7 @@ void ACO::run()
 		{
             AntColony colony(config);
             for (Ant& ant : colony.ants)
-                runAnt(ant, nodes, bestLen, bestPath, i, antId++, output_file);	
+                runAnt(ant, nodes, bestLen, bestPath, i, antId++, stat_file);	
             evaporate(colony);
 		}
 
@@ -260,7 +259,7 @@ void ACO::run()
 		{
             AntColony colony(config);
             for (Ant& ant : colony.ants)
-                runAnt(ant, nodes, bestLen, bestPath, sum_iter, antId++, output_file);	
+                runAnt(ant, nodes, bestLen, bestPath, sum_iter, antId++, stat_file);	
 
 			if (abs(lastBestPathLen - bestLen) > eps)
 			{
@@ -272,7 +271,7 @@ void ACO::run()
 		}		
 	}
 
-	output_file.close();
+	stat_file.close();
 
 	if (bestLen == paraml)
 	{
@@ -281,9 +280,21 @@ void ACO::run()
 	}
 
 	cout << "Best path length: " << bestLen << std::endl << "Path: ";
-	
+
 	for (auto n : bestPath)
 		cout << n->getName() << " ";
+
+	std::ofstream output_file(config("output", "output_file"));
+    
+    if (!output_file.is_open())
+        throw FileNotFoundError();
+
+    output_file << "Best path length: " << bestLen << std::endl << "Path: ";
+
+    for (auto n : bestPath)
+		output_file << n->getName() << " ";
+
+    output_file.close();
 		
 	std::cout << std::endl;
 }
