@@ -46,7 +46,7 @@ class AntColonyApp:
 
 	def init_from_config(self):
 		self.cpp_app = self.config['app'].get("name", "main")
-		self.csv_file = self.config['output'].get("output_file", "./output/output.csv")
+		self.csv_file = self.config['output'].get("statistic", "./output/stat.csv")
 		self.graphic_path = self.config['output'].get("graphic", "./output/graphic.png")
 		self.mean_graphic_path = self.config['output'].get("mean_graphic", "./output/mean_graphic.png")
 
